@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="idx.css">
+    <title>Product Inventory Manager</title>
+</head>
+<body>
+
+    <h1>Product Inventory</h1>
+
+    <!-- Form for Create and Update -->
+    <div class="form-container">
+        <h3 id="formTitle">Add New Product</h3>
+        <form id="productForm">
+            <input type="hidden" id="productId">
+            
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="description"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Price</label>
+                <input type="number" id="price" required>
+            </div>
+
+            <div class="form-group">
+                <label>Category ID (ex: 1 or 2 or any number available)</label>
+                <input type="number" id="categoryId" required>
+            </div>
+
+            <div class="form-group">
+                <label>Image</label>
+                <input type="file" id="image">
+            </div>
+
+            <button type="submit" id="submitBtn">Save Product</button>
+            <button type="button" class="cancel" onclick="resetForm()" style="display:none;" id="cancelBtn">Cancel</button>
+        </form>
+    </div>
+
+    <hr>
+
+    <!-- Display Data (Cards) & Images -->
+    <h2>Product List</h2>
+    <div class="product-list" id="productList">
+        <p>Loading...</p>
+    </div>
+
+    <script src="idx.js"></script>
+</body>
+</html>
