@@ -13,22 +13,13 @@ datasource db {
   url = env("DATABASE_URL")
 }
 
-model Category {
-  id        Int       @id @default(autoincrement())
-  name      String
-  products  Product[] // One-to-Many relationship
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-}
-
-model Product {
+model News {
   id         Int      @id @default(autoincrement())
-  name       String
-  description String?
-  price      Float
-  image      String?  // Store the file's path
-  categoryId Int
-  category   Category @relation(fields: [categoryId], references: [id])
+  title       String
+  content String? @db.Text // Larger size rather than a normal String variable
+  author       String
+  thumbnail      String?  // Store the file's path
+  published Boolean @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }

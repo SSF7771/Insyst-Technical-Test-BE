@@ -3,48 +3,43 @@ const fs = require("fs");
 const path = require("path");
 
 // CREATE
-const createProduct = async (req, res) => {
+const createNews = async (req, res) => {
   try {
-    const { name, price, categoryId, description } = req.body;
+    const { title, content, author } = req.body;
     const file = req.file; // From Multer
 
-    const product = await prisma.product.create({
+    if(!title | !author || !content)
+      return res.status(400).json({
+        success: false,
+        message: "Please input the required fields!"
+      });
+
+    const News = await prisma.news.create({
       data: {
-        name,
-        description,
-        price: parseFloat(price),
-        categoryId: parseInt(categoryId),
-        image: file ? file.path : null, // Save path to DB
+        title,
+        content,
+        author,
+        thumbnail: file ? file.path : null, // Save path to DB
+        published: false,
       },
     });
 
-    res.status(201).json({ message: "Product created", data: product });
+    res.status(201).json({ message: "News created successfully", data: News });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
 // READ
-const getAllProducts = async (req, res) => {
+const getPublishedNews = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
-    const skip = (page - 1) * limit;
-
-    const products = await prisma.product.findMany({
-      skip: parseInt(skip),
-      take: parseInt(limit),
-      include: { category: true }, // Relationship
+    const news = await prisma.news.findMany({
+      where: {published: true},
+      orderBy: {createdAt: "desc"}
     });
 
-    const totalData = await prisma.product.count();
-
     res.status(200).json({
-      data: products,
-      meta: {
-        totalData,
-        page: parseInt(page),
-        totalPages: Math.ceil(totalData / limit),
-      },
+      data: news,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -52,76 +47,123 @@ const getAllProducts = async (req, res) => {
 };
 
 // UPDATE
-const updateProduct = async (req, res) => {
+const updateNews = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, price, description } = req.body;
+    const { title, content, author } = req.body;
     const file = req.file;
 
-    // Find existing product to get old image path
-    const oldProduct = await prisma.product.findUnique({
+    // Find existing News to get old image path
+    const oldNews = await prisma.news.findUnique({
       where: { id: parseInt(id) },
     });
 
-    if (!oldProduct)
-      return res.status(404).json({ message: "Product not found" });
+    if (!oldNews)
+      return res.status(404).json({ message: "News not found" });
 
-    let imagePath = oldProduct.image;
+    let imagePath = oldNews.thumbnail;
 
     // If new file uploaded, delete old one and update path
     if (file) {
-      if (oldProduct.image) {
-        const oldPath = path.join(__dirname, "../../", oldProduct.image);
-        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath); // Delete old file
+      if (oldNews.thumbnail) {
+        const oldPath = path.join(__dirname, "../../", oldNews.thumbnail);
+        if (fs.existsSync(oldPath)) 
+          fs.unlinkSync(oldPath); // Delete old file
       }
 
       imagePath = file.path;
     }
 
-    const updatedProduct = await prisma.product.update({
+    const updatedNews = await prisma.news.update({
       where: { id: parseInt(id) },
       data: {
-        name,
-        price: price ? parseFloat(price) : undefined,
-        description,
-        image: imagePath,
+        title, 
+        content, 
+        author,
+        thumbnail: imagePath,
       },
     });
 
-    res.status(200).json({ message: "Product updated", data: updatedProduct });
+    res.status(200).json({ message: "News updated", data: updatedNews });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
 // DELETE
-const deleteProduct = async (req, res) => {
+const deleteNews = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await prisma.product.findUnique({
+    const news = await prisma.news.findUnique({
       where: { id: parseInt(id) },
     });
 
-    if (!product) return res.status(404).json({ message: "Product not found" });
+    if (!news) 
+      return res.status(404).json({ message: "News not found" });
 
     // Delete image from server
-    if (product.image) {
-      const filePath = path.join(__dirname, "../../", product.image);
+    if (news.image) {
+      const filePath = path.join(__dirname, "../../", news.image);
 
       if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     }
 
-    await prisma.product.delete({ where: { id: parseInt(id) } });
+    await prisma.news.delete({ where: { id: parseInt(id) } });
 
-    res.status(200).json({ message: "Product deleted successfully" });
+    res.status(200).json({ message: "News deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// UPDATE PUBLISHED STATUS
+const publishNews  = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the specific news through the id
+    const news = await prisma.news.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!news)
+      return res.status(404).json({ message: "News not found" });
+
+    const updatedNews = await prisma.news.update({
+      where: { id: parseInt(id) },
+      data: {
+        published: true
+      },
+    });
+
+    res.status(200).json({ message: "News published successfully", data: updatedNews });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// SEARCH NEWS BASED ON THE TITLE
+const searchNews = async (req, res) => {
+  try {
+    const { title } = req.query;
+    const news = await prisma.news.findMany({
+      where: {
+        title: {
+          contains: title
+        },
+      },
+    });
+    res.status(200).json({ data: news });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
 module.exports = {
-  createProduct,
-  getAllProducts,
-  updateProduct,
-  deleteProduct,
+  createNews,
+  getPublishedNews,
+  updateNews,
+  deleteNews,
+  publishNews,
+  searchNews
 };

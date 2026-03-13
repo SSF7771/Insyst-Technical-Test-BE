@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const router = require('./src/routes/index');
+const newsRoutes = require('./src/routes/Routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,10 +18,10 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
-app.use('/api', router);
+app.use('/news', newsRoutes);
 
 app.get('/', (req, res) => {
-    res.send('Mini Project 2 API is running');
+    res.send('API is running...');
 });
 
 // Start Server
