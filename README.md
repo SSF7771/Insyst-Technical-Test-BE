@@ -1,13 +1,11 @@
 # Insyst-Technical-Backend
 
-## POST /bookings — Membuat Booking Baru
-Endpoint ini digunakan untuk memproses pemesanan ruang meeting baru oleh pengguna.
+## POST /bookings
+Endpoint ini digunakan untuk memproses booking / pemesanan ruang meeting baru oleh pengguna.
 
-### Contoh Request Header
-```http
-POST /bookings
-Host: localhost:8000
-```
+- **Method:** `POST`
+- **Endpoint:** `/bookings`
+- **Headers**: `Content-Type: application/json`
 
 ### Contoh Request Body (JSON)
 ```json
@@ -95,5 +93,79 @@ Host: localhost:8000
   ```json
   {
     "message": "Terjadi kesalahan pada server"
+  }
+  ```
+
+## GET /rooms
+
+Endpoint ini digunakan untuk mendapatkan seluruh daftar ruangan meeting yang tersedia beserta fasilitas dan informasi detailnya.
+
+- **Method:** `GET`
+- **Endpoint:** `/rooms`
+
+### Contoh Response Sukses (`200 OK`)
+```json
+[
+  {
+    "id": 1,
+    "name": "Meeting Room Alpha",
+    "capacity": 10,
+    "pricePerHour": 150000,
+    "facilities": ["Projector", "Whiteboard", "AC"],
+    "image": "alpha.jpg"
+  }
+]
+```
+
+### Penanganan Error Server (`500 Internal Server Error`)
+- Gagal membaca data dari database.
+- **Response JSON:**
+  ```json
+  {
+    "error": "Internal Server Error"
+  }
+  ```
+
+---
+
+## GET /slots?roomId=[No]
+
+Endpoint ini digunakan untuk mengambil daftar slot waktu beserta status ketersediaannya (`isAvailable`) pada ruangan tertentu.
+
+- **Method:** `GET`
+- **Endpoint:** `/slots?roomId=1`
+- **Query Parameters:** 
+  - `roomId` (Integer) - ID ruangan yang ingin dilihat slot jamnya.
+
+### Contoh Response Sukses (`200 OK`)
+```json
+[
+  {
+    "id": 1,
+    "roomId": 1,
+    "time": "09:00 - 10:00",
+    "isAvailable": true
+  },
+  {
+    "id": 2,
+    "roomId": 1,
+    "time": "10:00 - 11:00",
+    "isAvailable": false
+  }
+]
+```
+
+### Penanganan Error:
+- Jika `roomId` tidak disertakan dalam query parameter.
+  ```json
+  {
+    "error": "roomId diperlukan"
+  }
+  ```
+- **Kesalahan Server (`500 Internal Server Error`):**
+  Terjadi kendala pada proses query database.
+  ```json
+  {
+    "error": "Internal Server Error"
   }
   ```
