@@ -25,7 +25,7 @@ Endpoint ini digunakan untuk memproses booking / pemesanan ruang meeting baru ol
 ## Alur Logika Server & Respons API
 ### Validasi Input Gagal (`422 Unprocessable Entity`)
 
-Jika terdapat kesalahan atau kekurangan pada data yang dikirimkan oleh klien, server akan mengembalikan respons dengan struktur objek terperinci (`details`) per masing-masing field.
+Jika ada kesalahan atau kekurangan pada data yang dikirimkan oleh user, server akan mengembalikan respons dengan struktur objek terperinci (`details`) per masing-masing field.
 
 - **Status code:** `422 Unprocessable Entity`
 - **Headers:** `Content-Type: application/json`
