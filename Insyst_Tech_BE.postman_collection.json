@@ -1,0 +1,110 @@
+{
+  "info": {
+    "_postman_id": "4dcda896-be39-4986-8cae-77ebf1a694fa",
+    "name": "Insyst Tech BE",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "47558149",
+    "_collection_link": "https://go.postman.co/collection/47558149-4dcda896-be39-4986-8cae-77ebf1a694fa?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Get Rooms",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{localhost}}/insyst/rooms",
+          "host": [
+            "{{localhost}}"
+          ],
+          "path": [
+            "insyst",
+            "rooms"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Slot by RoomID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{localhost}}/insyst/slots?roomId=1",
+          "host": [
+            "{{localhost}}"
+          ],
+          "path": [
+            "insyst",
+            "slots"
+          ],
+          "query": [
+            {
+              "key": "roomId",
+              "value": "1"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Bookings",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"roomId\": 1,\r\n  \"slotId\": 1,\r\n  \"date\": \"2026-10-20\",\r\n  \"name\": \"Budi\",\r\n  \"email\": \"budi@email.com\",\r\n  \"phone\": \"081234567890\",\r\n  \"participants\": 3\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{localhost}}/insyst/bookings",
+          "host": [
+            "{{localhost}}"
+          ],
+          "path": [
+            "insyst",
+            "bookings"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "localhost",
+      "value": "http://localhost:8000"
+    }
+  ]
+}
