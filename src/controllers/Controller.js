@@ -1,21 +1,40 @@
 const prisma = require("../utils/prismaClient");
+const isValidDateString = require("../utils/helpers.js");
 
 // POST /bookings
 const createBooking = async (req, res) => {
   const { roomId, slotId, date, name, email, phone, participants } = req.body;
+  const details = {};
 
-  if (
-    !roomId ||
-    !slotId ||
-    !date ||
-    !name ||
-    !email ||
-    !phone ||
-    !participants
-  ) {
-    return res
-      .status(422)
-      .json({ message: "Semua field wajib diisi dengan benar." });
+  if (!name) 
+    details.name = ["Nama wajib diisi"];
+
+  if (!email)
+    details.email = ["Email tidak valid atau wajib diisi"];
+
+  if (!date || !isValidDateString(date)) 
+    details.date = ["Format tanggal harus YYYY-MM-DD"];
+  
+  else {
+    // Cek apakah tanggal di masa lalu
+    const todayStr = new Date().toISOString().split("T")[0];
+    if (date < todayStr)
+      details.date = ["Tanggal tidak boleh di masa lalu"];
+  }
+
+  if (!slotId || typeof slotId !== "number")
+    details.slotId = ["Slot ID harus berupa angka yang valid"];
+  
+  if (!participants || typeof participants !== "number" || participants < 1) 
+    details.participants = ["Participants harus integer / angka bulat >= 1"];
+  
+  if (Object.keys(details).length > 0) {
+    return res.status(422).json({
+      status: 422,
+      error: "ValidationError",
+      message: "Input tidak valid",
+      details,
+    });
   }
 
   try {
@@ -41,17 +60,6 @@ const createBooking = async (req, res) => {
     if (existingBooking) {
       return res.status(409).json({
         message: "Slot jam pada tanggal tersebut sudah dibooking orang lain.",
-      });
-    }
-
-    // Cek status availability slot
-    const slot = await prisma.slot.findUnique({
-      where: { id: parseInt(slotId) }
-    });
-
-    if (!slot || !slot.isAvailable) {
-      return res.status(409).json({
-        message: "Slot waktu ini tidak valid atau sudah tidak tersedia.",
       });
     }
 
@@ -86,7 +94,6 @@ const createBooking = async (req, res) => {
       bookingCode: newBooking.bookingCode,
       booking: newBooking,
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Terjadi kesalahan pada server" });
@@ -103,7 +110,6 @@ const getRooms = async (req, res) => {
       image: r.image,
     }));
     res.status(200).json(formattedRooms);
-
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
@@ -113,16 +119,17 @@ const getRooms = async (req, res) => {
 // Notes: untuk roomId, uji pakai Params di Postman
 const getSlot = async (req, res) => {
   const { roomId } = req.query;
-  if (!roomId) 
-    return res.status(400).json({ error: "roomId diperlukan" });
+  if (!roomId) return res.status(400).json({ error: "roomId diperlukan" });
 
   try {
     const slots = await prisma.slot.findMany({
       where: { roomId: parseInt(roomId) },
     });
 
+    if (!slots)
+      return res.status(404).json({ message: "Ruangan tidak ditemukan" });
+
     res.status(200).json(slots);
-    
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
