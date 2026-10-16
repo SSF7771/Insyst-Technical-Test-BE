@@ -23,13 +23,35 @@ Endpoint ini digunakan untuk memproses booking / pemesanan ruang meeting baru ol
 ---
 
 ## Alur Logika Server & Respons API
-### Validasi Input Dasar (`422 Unprocessable Entity`)
-- **Kondisi Berdasarkan Kode:** Dipicu jika salah satu parameter wajib (`roomId`, `slotId`, `date`, `name`, `email`, `phone`, `participants`) bernilai kosong, `undefined`, atau tidak disertakan dalam body request.
-- **Status Code:** `422 Unprocessable Entity`
-- **Format Response JSON:**
+### Validasi Input Gagal (`422 Unprocessable Entity`)
+
+Jika terdapat kesalahan atau kekurangan pada data yang dikirimkan oleh klien, server akan mengembalikan respons dengan struktur objek terperinci (`details`) per masing-masing field.
+
+- **Status code:** `422 Unprocessable Entity`
+- **Headers:** `Content-Type: application/json`
+- **Contoh Body Respons:**
   ```json
   {
-    "message": "Semua field wajib diisi dengan benar."
+      "status": 422,
+      "error": "ValidationError",
+      "message": "Input tidak valid",
+      "details": {
+          "name": [
+              "Nama wajib diisi"
+          ],
+          "email": [
+              "Email tidak valid atau wajib diisi"
+          ],
+          "date": [
+              "Format tanggal harus YYYY-MM-DD"
+          ],
+          "slotId": [
+              "Slot ID harus berupa angka yang valid"
+          ],
+          "participants": [
+              "Participants harus integer / angka bulat >= 1"
+          ]
+      }
   }
   ```
 
