@@ -1,5 +1,7 @@
 # Insyst-Technical-Backend
 
+### Link Postman Collection: https://shanesutjipto-9627760.postman.co/workspace/Shane-Sutjipto's-Workspace~d09434f8-fc27-4576-85ca-12c61e8d7da0/collection/47558149-4dcda896-be39-4986-8cae-77ebf1a694fa?action=share&source=copy-link&creator=47558149
+
 ## POST /bookings
 Endpoint ini digunakan untuk memproses booking / pemesanan ruang meeting baru oleh pengguna.
 
