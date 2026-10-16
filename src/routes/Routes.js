@@ -1,31 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const {
-    createNews,
-    getPublishedNews,
-    updateNews,
-    deleteNews,
-    publishNews,
-    searchNews,
+    getRooms,
+    createBooking,
+    getSlot
 } = require('../controllers/Controller');
-const upload = require('../middlewares/upload');
 
-// Read
-router.get('/', getPublishedNews);
+// Get Rooms
+router.get('/rooms', getRooms);
 
-// Create (with Image)
-router.post('/', upload.single('thumbnail'), createNews);
+// Get Slot (with roomId)
+router.get('/slots', getSlot);
 
-// Update (with Image)
-router.put('/:id', upload.single('thumbnail'), updateNews);
-
-// ONLY update the published status
-router.patch('/:id/publish', publishNews);
-
-// Get the news according to the searched titles
-router.get("/search", searchNews);
-
-// Delete
-router.delete('/:id', deleteNews);
+// Create Bookings
+router.post('/bookings', createBooking);
 
 module.exports = router;

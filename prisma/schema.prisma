@@ -13,13 +13,37 @@ datasource db {
   url = env("DATABASE_URL")
 }
 
-model News {
-  id         Int      @id @default(autoincrement())
-  title       String
-  content String? @db.Text // Larger size rather than a normal String variable
-  author       String
-  thumbnail      String?  // Store the file's path
-  published Boolean @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+model Room {
+  id           Int       @id @default(autoincrement())
+  name         String
+  capacity     Int
+  pricePerHour Float
+  facilities   String
+  image        String
+  slots        Slot[]
+  bookings     Booking[]
+}
+
+model Slot {
+  id          Int       @id @default(autoincrement())
+  roomId      Int
+  room        Room      @relation(fields: [roomId], references: [id])
+  time        String
+  isAvailable Boolean   @default(true)
+  bookings    Booking[]
+}
+
+model Booking {
+  id           Int      @id @default(autoincrement())
+  bookingCode  String   @unique
+  roomId       Int
+  room         Room     @relation(fields: [roomId], references: [id])
+  slotId       Int
+  slot         Slot     @relation(fields: [slotId], references: [id])
+  date         String
+  name         String
+  email        String
+  phone        String
+  participants Int
+  createdAt    DateTime @default(now())
 }

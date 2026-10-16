@@ -1,169 +1,135 @@
 const prisma = require("../utils/prismaClient");
-const fs = require("fs");
-const path = require("path");
 
-// CREATE
-const createNews = async (req, res) => {
+// POST /bookings
+const createBooking = async (req, res) => {
+  const { roomId, slotId, date, name, email, phone, participants } = req.body;
+
+  if (
+    !roomId ||
+    !slotId ||
+    !date ||
+    !name ||
+    !email ||
+    !phone ||
+    !participants
+  ) {
+    return res
+      .status(422)
+      .json({ message: "Semua field wajib diisi dengan benar." });
+  }
+
   try {
-    const { title, content, author } = req.body;
-    const file = req.file; // From Multer
+    // Cek kapasitas Room
+    const room = await prisma.room.findUnique({
+      where: { id: parseInt(roomId) },
+    });
 
-    if(!title | !author || !content)
-      return res.status(400).json({
-        success: false,
-        message: "Please input the required fields!"
+    if (!room)
+      return res.status(404).json({ message: "Ruangan tidak ditemukan" });
+
+    if (participants > room.capacity) {
+      return res.status(422).json({
+        message: `Jumlah partisipan melebihi kapasitas ruangan (${room.capacity} orang).`,
       });
-
-    const News = await prisma.news.create({
-      data: {
-        title,
-        content,
-        author,
-        thumbnail: file ? file.path : null, // Save path to DB
-        published: false,
-      },
-    });
-
-    res.status(201).json({ message: "News created successfully", data: News });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// READ
-const getPublishedNews = async (req, res) => {
-  try {
-    const news = await prisma.news.findMany({
-      where: {published: true},
-      orderBy: {createdAt: "desc"}
-    });
-
-    res.status(200).json({
-      data: news,
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// UPDATE
-const updateNews = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { title, content, author } = req.body;
-    const file = req.file;
-
-    // Find existing News to get old image path
-    const oldNews = await prisma.news.findUnique({
-      where: { id: parseInt(id) },
-    });
-
-    if (!oldNews)
-      return res.status(404).json({ message: "News not found" });
-
-    let imagePath = oldNews.thumbnail;
-
-    // If new file uploaded, delete old one and update path
-    if (file) {
-      if (oldNews.thumbnail) {
-        const oldPath = path.join(__dirname, "../../", oldNews.thumbnail);
-        if (fs.existsSync(oldPath)) 
-          fs.unlinkSync(oldPath); // Delete old file
-      }
-
-      imagePath = file.path;
     }
 
-    const updatedNews = await prisma.news.update({
-      where: { id: parseInt(id) },
-      data: {
-        title, 
-        content, 
-        author,
-        thumbnail: imagePath,
-      },
+    // Slot sudah terisi di tanggal yang sama atau belum (StatusCode 409)
+    const existingBooking = await prisma.booking.findFirst({
+      where: { roomId: parseInt(roomId), slotId: parseInt(slotId), date },
     });
 
-    res.status(200).json({ message: "News updated", data: updatedNews });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// DELETE
-const deleteNews = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const news = await prisma.news.findUnique({
-      where: { id: parseInt(id) },
-    });
-
-    if (!news) 
-      return res.status(404).json({ message: "News not found" });
-
-    // Delete image from server
-    if (news.image) {
-      const filePath = path.join(__dirname, "../../", news.image);
-
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    if (existingBooking) {
+      return res.status(409).json({
+        message: "Slot jam pada tanggal tersebut sudah dibooking orang lain.",
+      });
     }
 
-    await prisma.news.delete({ where: { id: parseInt(id) } });
-
-    res.status(200).json({ message: "News deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// UPDATE PUBLISHED STATUS
-const publishNews  = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    // Find the specific news through the id
-    const news = await prisma.news.findUnique({
-      where: { id: parseInt(id) },
+    // Cek status availability slot
+    const slot = await prisma.slot.findUnique({
+      where: { id: parseInt(slotId) }
     });
 
-    if (!news)
-      return res.status(404).json({ message: "News not found" });
+    if (!slot || !slot.isAvailable) {
+      return res.status(409).json({
+        message: "Slot waktu ini tidak valid atau sudah tidak tersedia.",
+      });
+    }
 
-    const updatedNews = await prisma.news.update({
-      where: { id: parseInt(id) },
-      data: {
-        published: true
-      },
-    });
+    // Buat Booking Baru
+    const bookingCode =
+      "BK-" + Math.random().toString(36).substring(2, 8).toUpperCase();
 
-    res.status(200).json({ message: "News published successfully", data: updatedNews });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// SEARCH NEWS BASED ON THE TITLE
-const searchNews = async (req, res) => {
-  try {
-    const { title } = req.query;
-    const news = await prisma.news.findMany({
-      where: {
-        title: {
-          contains: title
+    const [newBooking, updatedSlot] = await prisma.$transaction([
+      // Simpan data booking baru
+      prisma.booking.create({
+        data: {
+          bookingCode,
+          roomId: parseInt(roomId),
+          slotId: parseInt(slotId),
+          date,
+          name,
+          email,
+          phone,
+          participants: parseInt(participants),
         },
-      },
+      }),
+
+      // Ubah status isAvailable slot menjadi false (singkatnya menutup slot)
+      prisma.slot.update({
+        where: { id: parseInt(slotId) },
+        data: { isAvailable: false },
+      }),
+    ]);
+
+    res.status(201).json({
+      message: "Booking berhasil dibuat",
+      bookingCode: newBooking.bookingCode,
+      booking: newBooking,
     });
-    res.status(200).json({ data: news });
+
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error(error);
+    res.status(500).json({ message: "Terjadi kesalahan pada server" });
+  }
+};
+
+// GET /rooms
+const getRooms = async (req, res) => {
+  try {
+    const rooms = await prisma.room.findMany();
+    const formattedRooms = rooms.map((r) => ({
+      ...r,
+      facilities: JSON.parse(r.facilities || "[]"),
+      image: r.image,
+    }));
+    res.status(200).json(formattedRooms);
+
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+// GET /slots?roomId=[No]
+// Notes: untuk roomId, uji pakai Params di Postman
+const getSlot = async (req, res) => {
+  const { roomId } = req.query;
+  if (!roomId) 
+    return res.status(400).json({ error: "roomId diperlukan" });
+
+  try {
+    const slots = await prisma.slot.findMany({
+      where: { roomId: parseInt(roomId) },
+    });
+
+    res.status(200).json(slots);
+    
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
 module.exports = {
-  createNews,
-  getPublishedNews,
-  updateNews,
-  deleteNews,
-  publishNews,
-  searchNews
+  createBooking,
+  getRooms,
+  getSlot,
 };

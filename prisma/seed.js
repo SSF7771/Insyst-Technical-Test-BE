@@ -1,24 +1,47 @@
-require('dotenv').config(); 
+require("dotenv").config();
 
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 async function main() {
+  // Hapus data lama (jika ada)
+  await prisma.booking.deleteMany();
+  await prisma.slot.deleteMany();
+  await prisma.room.deleteMany();
 
-  // 5 Dummy News
-  const news = [];
-  for (let i = 1; i <= 5; i++) {
-    news.push({
-      title: `News ${i}`,
-      content: `Content for news ${i}`,
-      author: `Author ${i}`,
-      thumbnail: null,
-      published: i % 2 == 0 ? true : false
-    });
-  }
+  // Data Rooms
+  const room1 = await prisma.room.create({
+    data: {
+      name: "Meeting Room Alpha",
+      capacity: 10,
+      pricePerHour: 150000,
+      facilities: JSON.stringify(["Projector", "Whiteboard", "AC"]),
+      image: "alpha.jpg",
+    },
+  });
 
-  await prisma.news.createMany({ data: news });
-  console.log('Seeding successful!');
+  const room2 = await prisma.room.create({
+    data: {
+      name: "Boardroom Beta",
+      capacity: 6,
+      pricePerHour: 100000,
+      facilities: JSON.stringify(["TV Screen", "AC"]),
+      image: "beta.jpg",
+    },
+  });
+
+  // Data Slots untuk Room 1 & Room 2
+  await prisma.slot.createMany({
+    data: [
+      { roomId: room1.id, time: "09:00 - 10:00", isAvailable: true },
+      { roomId: room1.id, time: "10:00 - 11:00", isAvailable: true },
+      { roomId: room1.id, time: "13:00 - 14:00", isAvailable: true },
+      { roomId: room2.id, time: "09:00 - 10:00", isAvailable: true },
+      { roomId: room2.id, time: "14:00 - 15:00", isAvailable: true },
+    ],
+  });
+
+  console.log("Seeding successful!");
 }
 
 main()

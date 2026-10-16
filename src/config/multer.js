@@ -10,7 +10,7 @@ if (!fs.existsSync(uploadDir)) {
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Save to local disk server
+    cb(null, "uploads/"); // Save to local disk
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now();
