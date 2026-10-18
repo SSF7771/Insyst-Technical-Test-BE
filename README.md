@@ -1,11 +1,5 @@
 # Insyst-Technical-Backend
 
-# Panduan Setup Awal & Cara Menjalankan Backend
-
-Dokumentasi lengkap mengenai langkah-langkah instalasi dan perintah yang diperlukan untuk menyiapkan serta menjalankan proyek backend dari awal (*from scratch*).
-
----
-
 ## Langkah-Langkah Setup Awal
 
 ### 1. Masuk ke Folder Proyek Backend
@@ -32,7 +26,18 @@ DATABASE_URL="mysql://root@localhost:3306/[nama_database]"
 ```
 
 ### 4. Membuat Tabel Database (Migrasi Pertama / Inisialisasi)
-Jalankan perintah migrasi Prisma untuk membuat struktur tabel (`rooms`, `slots`, dan `bookings`) ke database lokal:
+Jalankan ini untuk membuat folder `prisma` dan file konfigurasinya secara otomatis:
+
+```bash
+npx prisma init
+```
+
+Atau
+```bash
+npx prisma init --datasource-provider mysql
+```
+
+Jalankan migrasi Prisma untuk membuat struktur tabel (`rooms`, `slots`, dan `bookings`) ke database lokal:
 ```bash
 npx prisma migrate dev --name init
 ```
