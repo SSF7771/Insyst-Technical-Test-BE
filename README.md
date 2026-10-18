@@ -56,7 +56,6 @@ npx prisma db seed
 ```bash
 npm run dev
 ```
-*(Atau jika menggunakan perintah standar: `npm run start`)*
 
 Server backend kini sudah aktif dan dapat diakses di:
 `http://localhost:8000`
