@@ -247,3 +247,12 @@ Endpoint ini digunakan untuk mengambil daftar slot waktu beserta status ketersed
     "error": "Internal Server Error"
   }
   ```
+
+# Penggunaan AI (Artificial Intelligence)
+
+Dalam pengembangan proyek ini, AI dimanfaatkan untuk membantu berbagai aspek teknis dan penyusunan dokumentasi, yang mencakup poin-poin sebagai berikut:
+
+- Memastikan penulisan sintaks Prisma ORM dan logika Express.js akurat serta berjalan secara efisien.
+- Membantu memastikan hubungan relasi database yang tepat antara tabel `Room`, `Slot`, dan `Booking` secara *one-to-many*.
+- Menyiapkan struktur data awal contoh untuk ruangan, fasilitas, dan slot waktu agar sistem siap diuji.
+- Menyusun, merapikan, dan memformat teks penjelasan serta instruksi teknis pada file `README.md` agar mudah dibaca dan dipahami (menghindari miskomunikasi).
