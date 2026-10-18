@@ -1,5 +1,61 @@
 # Insyst-Technical-Backend
 
+# Panduan Setup Awal & Cara Menjalankan Backend
+
+Dokumentasi lengkap mengenai langkah-langkah instalasi dan perintah yang diperlukan untuk menyiapkan serta menjalankan proyek backend dari awal (*from scratch*).
+
+---
+
+## Langkah-Langkah Setup Awal
+
+### 1. Masuk ke Folder Proyek Backend
+Buka terminal/command prompt, lalu arahkan direktori ke folder tempat proyek backend:
+```bash
+cd [path/ke/folder-backend]
+```
+
+### 2. Install Dependencies
+Instal seluruh pustaka (*libraries*) yang dibutuhkan oleh proyek (seperti Express, Prisma, CORS, dll.):
+```bash
+npm install
+```
+Atau
+```bash
+npm i
+```
+
+### 3. Konfigurasi Environment (`.env`)
+Buat file bernama `.env` di root folder backend, lalu tentukan konfigurasi koneksi database (menggunakan MySQL sebagai providernya):
+Contoh variabelnya di file env:
+```env
+DATABASE_URL="mysql://root@localhost:3306/[nama_database]"
+```
+
+### 4. Membuat Tabel Database (Migrasi Pertama / Inisialisasi)
+Jalankan perintah migrasi Prisma untuk membuat struktur tabel (`rooms`, `slots`, dan `bookings`) ke database lokal:
+```bash
+npx prisma migrate dev --name init
+```
+
+### 5. Mengisi Data dengan Seeding ke Database
+Masukkan data contoh (seperti data ruangan meeting dan slot jam) ke dalam database menggunakan script seeder:
+```bash
+npx prisma db seed
+```
+*(Notes: Pastikan konfigurasi `"prisma": { "seed": "node prisma/seed.js" }` sudah terdaftar di dalam file `package.json`).*
+
+---
+
+## Cara Menjalankan Server
+
+```bash
+npm run dev
+```
+*(Atau jika menggunakan perintah standar: `npm run start`)*
+
+Server backend kini sudah aktif dan dapat diakses di:
+`http://localhost:8000`
+
 ## POST /bookings
 Endpoint ini digunakan untuk memproses booking / pemesanan ruang meeting baru oleh pengguna.
 
