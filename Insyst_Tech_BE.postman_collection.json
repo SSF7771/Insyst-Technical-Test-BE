@@ -65,7 +65,7 @@
           "id": 2,
           "roomId": 1,
           "time": "10:00 - 11:00",
-          "isAvailable": false
+          "isAvailable": true
         },
         {
           "id": 3,
