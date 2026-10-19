@@ -8,6 +8,11 @@ Buka terminal/command prompt, lalu arahkan direktori ke folder tempat proyek bac
 cd [path/ke/folder-backend]
 ```
 
+Lalu, buat file package.json dengan pengaturan default:
+```bash
+npm init -y
+```
+
 ### 2. Install Dependencies
 Instal seluruh pustaka (*libraries*) yang dibutuhkan oleh proyek (seperti Express, Prisma, CORS, dll.):
 ```bash
