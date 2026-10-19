@@ -22,6 +22,9 @@ const createBooking = async (req, res) => {
       details.date = ["Tanggal tidak boleh di masa lalu"];
   }
 
+  if (!roomId || typeof roomId !== "number")
+    details.roomId = ["Room ID harus berupa angka yang valid"];
+
   if (!slotId || typeof slotId !== "number")
     details.slotId = ["Slot ID harus berupa angka yang valid"];
   
@@ -30,7 +33,6 @@ const createBooking = async (req, res) => {
   
   if (Object.keys(details).length > 0) {
     return res.status(422).json({
-      status: 422,
       error: "ValidationError",
       message: "Input tidak valid",
       details,
