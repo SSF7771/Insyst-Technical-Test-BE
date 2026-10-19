@@ -97,7 +97,6 @@ Jika ada kesalahan atau kekurangan pada data yang dikirimkan oleh user, server a
 - **Contoh Body Respons:**
   ```json
   {
-      "status": 422,
       "error": "ValidationError",
       "message": "Input tidak valid",
       "details": {
@@ -109,6 +108,9 @@ Jika ada kesalahan atau kekurangan pada data yang dikirimkan oleh user, server a
           ],
           "date": [
               "Format tanggal harus YYYY-MM-DD"
+          ],
+          "roomId": [
+              "Room ID harus berupa angka yang valid"
           ],
           "slotId": [
               "Slot ID harus berupa angka yang valid"
