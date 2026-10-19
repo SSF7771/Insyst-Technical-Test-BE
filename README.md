@@ -211,7 +211,7 @@ Endpoint ini digunakan untuk mendapatkan seluruh daftar ruangan meeting yang ter
 - **Response JSON:**
   ```json
   {
-    "error": "Internal Server Error"
+    "error": "Terjadi kesalahan pada server"
   }
   ```
 
@@ -255,7 +255,7 @@ Endpoint ini digunakan untuk mengambil daftar slot waktu beserta status ketersed
   Terjadi kendala pada proses query database.
   ```json
   {
-    "error": "Internal Server Error"
+    "error": "Terjadi kesalahan pada server"
   }
   ```
 
