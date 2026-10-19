@@ -14,16 +14,28 @@
         "header": [],
         "url": {
           "raw": "{{localhost}}/insyst/rooms",
-          "host": [
-            "{{localhost}}"
-          ],
-          "path": [
-            "insyst",
-            "rooms"
-          ]
+          "host": ["{{localhost}}"],
+          "path": ["insyst", "rooms"]
         }
       },
-      "response": []
+      "response": [
+        {
+          "id": 1,
+          "name": "Meeting Room Alpha",
+          "capacity": 10,
+          "pricePerHour": 150000,
+          "facilities": ["Projector", "Whiteboard", "AC"],
+          "image": "alpha.jpg"
+        },
+        {
+          "id": 2,
+          "name": "Boardroom Beta",
+          "capacity": 6,
+          "pricePerHour": 100000,
+          "facilities": ["TV Screen", "AC"],
+          "image": "beta.jpg"
+        }
+      ]
     },
     {
       "name": "Get Slot by RoomID",
@@ -32,13 +44,8 @@
         "header": [],
         "url": {
           "raw": "{{localhost}}/insyst/slots?roomId=1",
-          "host": [
-            "{{localhost}}"
-          ],
-          "path": [
-            "insyst",
-            "slots"
-          ],
+          "host": ["{{localhost}}"],
+          "path": ["insyst", "slots"],
           "query": [
             {
               "key": "roomId",
@@ -47,7 +54,26 @@
           ]
         }
       },
-      "response": []
+      "response": [
+        {
+          "id": 1,
+          "roomId": 1,
+          "time": "09:00 - 10:00",
+          "isAvailable": false
+        },
+        {
+          "id": 2,
+          "roomId": 1,
+          "time": "10:00 - 11:00",
+          "isAvailable": false
+        },
+        {
+          "id": 3,
+          "roomId": 1,
+          "time": "13:00 - 14:00",
+          "isAvailable": true
+        }
+      ]
     },
     {
       "name": "Create Bookings",
@@ -56,7 +82,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"roomId\": 1,\r\n  \"slotId\": 1,\r\n  \"date\": \"2026-10-20\",\r\n  \"name\": \"Budi\",\r\n  \"email\": \"budi@email.com\",\r\n  \"phone\": \"081234567890\",\r\n  \"participants\": 3\r\n}",
+          "raw": "{\r\n  \"roomId\": 1,\r\n  \"slotId\": 2,\r\n  \"date\": \"2026-10-20\",\r\n  \"name\": \"Budi\",\r\n  \"email\": \"budi@email.com\",\r\n  \"phone\": \"081234567890\",\r\n  \"participants\": 3\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -65,16 +91,26 @@
         },
         "url": {
           "raw": "{{localhost}}/insyst/bookings",
-          "host": [
-            "{{localhost}}"
-          ],
-          "path": [
-            "insyst",
-            "bookings"
-          ]
+          "host": ["{{localhost}}"],
+          "path": ["insyst", "bookings"]
         }
       },
-      "response": []
+      "response": {
+        "message": "Booking berhasil dibuat",
+        "bookingCode": "BK-H2HQZK",
+        "booking": {
+          "id": 2,
+          "bookingCode": "BK-H2HQZK",
+          "roomId": 1,
+          "slotId": 2,
+          "date": "2026-10-20",
+          "name": "Budi",
+          "email": "budi@email.com",
+          "phone": "081234567890",
+          "participants": 3,
+          "createdAt": "2026-10-19T04:18:16.627Z"
+        }
+      }
     }
   ],
   "event": [
@@ -84,9 +120,7 @@
         "type": "text/javascript",
         "packages": {},
         "requests": {},
-        "exec": [
-          ""
-        ]
+        "exec": [""]
       }
     },
     {
@@ -95,9 +129,7 @@
         "type": "text/javascript",
         "packages": {},
         "requests": {},
-        "exec": [
-          ""
-        ]
+        "exec": [""]
       }
     }
   ],
