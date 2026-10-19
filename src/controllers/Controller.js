@@ -113,7 +113,7 @@ const getRooms = async (req, res) => {
     }));
     res.status(200).json(formattedRooms);
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Terjadi kesalahan pada server" });
   }
 };
 
@@ -133,7 +133,7 @@ const getSlot = async (req, res) => {
 
     res.status(200).json(slots);
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Terjadi kesalahan pada server" });
   }
 };
 
